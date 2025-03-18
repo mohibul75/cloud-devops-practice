@@ -1,0 +1,42 @@
+pilot:
+  autoscaleEnabled: false
+  resources:
+    requests:
+      cpu: 500m
+      memory: 500Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+
+global:
+  proxy:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  
+  logging:
+    level: "default:info"
+
+meshConfig:
+  enableTracing: true
+  defaultConfig:
+    tracing:
+      sampling: 100
+      zipkin:
+        address: tempo.monitoring:9411
+
+  accessLogFile: /dev/stdout
+  enablePrometheusMerge: true
+
+telemetry:
+  enabled: true
+  v2:
+    enabled: true
+    prometheus:
+      enabled: true
+    stackdriver:
+      enabled: false

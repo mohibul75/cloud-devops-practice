@@ -1,0 +1,41 @@
+auth:
+  strategy: anonymous
+
+deployment:
+  accessible_namespaces:
+    - "**"
+  ingress:
+    enabled: true
+  service_type: ClusterIP
+  logger:
+    log_level: info
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+external_services:
+  grafana:
+    enabled: true
+    in_cluster_url: ${grafana_url}
+    url: ${grafana_url}
+  prometheus:
+    url: ${prometheus_url}
+  tracing:
+    enabled: true
+    in_cluster_url: ${tracing_url}
+    url: ${tracing_url}
+
+server:
+  web_root: /kiali
+
+istio_namespace: istio-system
+
+api:
+  namespaces:
+    exclude:
+      - kube-system
+      - kube-public

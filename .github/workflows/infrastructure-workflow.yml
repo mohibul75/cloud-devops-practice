@@ -1,0 +1,102 @@
+name: 'Infrastructure CI/CD Pipeline'
+
+on:
+  push:
+    branches: 
+      - main
+    paths:
+      - 'iac/**'
+      - '.github/workflows/infrastructure-workflow.yml'
+  pull_request:
+    branches: 
+      - main
+    paths:
+      - 'iac/**'
+      - '.github/workflows/infrastructure-workflow.yml'
+  workflow_dispatch:
+
+
+permissions:
+  contents: read
+  id-token: write
+  
+
+jobs:
+  terraform:
+    name: 'Terraform Infrastructure Job'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+        aws-region: ${{ secrets.AWS_REGION }}
+        role-session-name: GitHubActionsSession
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.6.0"
+
+    - name: Create Terraform Variables File
+      run: |
+        # Fetch all parameters from AWS Parameter Store
+        export AWS_REGION="${AWS_REGION}"
+        export PROJECT=$(aws ssm get-parameter --name "/eks/iac/dev/project" --query "Parameter.Value" --output text)
+        export ENVIRONMENT=$(aws ssm get-parameter --name "/eks/iac/dev/environment" --query "Parameter.Value" --output text)
+        export VPC_CIDR=$(aws ssm get-parameter --name "/eks/iac/dev/vpc_cidr" --query "Parameter.Value" --output text)
+        export CLUSTER_VERSION=$(aws ssm get-parameter --name "/eks/iac/dev/cluster_version" --query "Parameter.Value" --output text)
+        export PUBLIC_SUBNETS=$(aws ssm get-parameter --name "/eks/iac/dev/public_subnets" --query "Parameter.Value" --output text)
+        export PRIVATE_SUBNETS=$(aws ssm get-parameter --name "/eks/iac/dev/private_subnets" --query "Parameter.Value" --output text)
+        
+        # Get availability zones for the region
+        export AZS=$(aws ec2 describe-availability-zones --region ${AWS_REGION} --query 'AvailabilityZones[*].ZoneName' --output json)
+        
+        # Fetch node group configuration from parameter store
+        export NODE_GROUPS=$(aws ssm get-parameter --name "/eks/iac/dev/node_groups" --query "Parameter.Value" --output text)
+        
+        # Create tags JSON from parameter store
+        export TAGS=$(aws ssm get-parameter --name "/eks/iac/dev/tags" --query "Parameter.Value" --output text)
+
+        # Create terraform.tfvars file
+        cat << EOF > terraform.tfvars
+        aws_region = "${AWS_REGION}"
+        project = "${PROJECT}"
+        environment = "${ENVIRONMENT}"
+        vpc_cidr = "${VPC_CIDR}"
+        public_subnets = ${PUBLIC_SUBNETS}
+        private_subnets = ${PRIVATE_SUBNETS}
+        azs = ${AZS}
+        cluster_version = "${CLUSTER_VERSION}"
+        node_groups = ${NODE_GROUPS}
+        tags = ${TAGS}
+        dockerhub_username = "${{ secrets.DOCKERHUB_USERNAME }}"
+        dockerhub_token = "${{ secrets.DOCKERHUB_TOKEN }}"
+        EOF
+      working-directory: ./iac
+
+    - name: Terraform Init
+      run: terraform init -backend-config=dev-backend.hcl
+      working-directory: ./iac
+
+    # - name: Terraform Destroy
+    #   run: terraform destroy -auto-approve
+    #   working-directory: ./iac
+
+    - name: Terraform Plan
+      run: terraform plan -out tfplan.plan -var-file=terraform.tfvars
+      working-directory: ./iac
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve tfplan.plan
+      working-directory: ./iac
