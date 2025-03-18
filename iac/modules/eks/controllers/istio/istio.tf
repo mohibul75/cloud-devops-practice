@@ -44,7 +44,7 @@ resource "helm_release" "istiod" {
 }
 
 # Install Istio Ingress Gateway
-resource "helm_release" "istio_ingress" {
+resource "helm_release" "istio_ingress_gateway" {
   name       = "istio-ingress"
   repository = "https://istio-release.storage.googleapis.com/charts"
   chart      = "gateway"
