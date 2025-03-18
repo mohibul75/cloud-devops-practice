@@ -158,40 +158,39 @@ docs(readme): update deployment instructions
 
 ## AI Integration
 
-### Code Review
-We use Reddit AI for automated code reviews:
+### Automated Code Review
 
-1. **Setup**
-   - Install Reddit AI GitHub App
-   - Configure review preferences
-   - Set security scanning rules
+This repository uses [CodeRabbit AI](https://www.coderabbit.ai/) for automated code reviews, ensuring code quality even in self-maintained projects. CodeRabbit AI provides comprehensive code analysis and suggestions for improvements.
 
-2. **Features**
-   - Automated code quality checks
-   - Security vulnerability scanning
-   - Best practice recommendations
-   - Documentation completeness
+#### Features
 
-3. **Usage**
-   ```bash
-   # Trigger manual review
-   /reddit-review
+- Automated code quality assessment
+- Security vulnerability detection
+- Performance optimization suggestions
+- Style and best practices enforcement
+- Documentation completeness checks
+- Inline code suggestions with commit-ready improvements
 
-   # Request specific check
-   /reddit-review security
-   ```
+#### Example Reviews
 
-4. **Configuration**
-   ```yaml
-   reddit:
-     checks:
-       - security
-       - style
-       - performance
-     ignore:
-       - "*.md"
-       - "*.txt"
-   ```
+Here are examples of CodeRabbit AI in action:
+
+1. **Pull Request Summary**  
+   CodeRabbit AI provides a comprehensive summary of changes and their impact:
+   ![Example Code Review](docs/static-resources/commit-summary.png)
+
+2. **Inline Code Suggestions**  
+   Detailed code improvements with ready-to-commit suggestions:
+   ![PR Comment](docs/static-resources/PR-review-comment.png)
+
+#### Best Practices
+
+1. Always review AI suggestions before implementing
+2. Pay special attention to security-related recommendations
+3. Use AI suggestions as learning opportunities to improve code quality
+4. Consider implementing suggested improvements promptly for better code maintainability
+
+For more information about CodeRabbit AI configuration and features, visit their [official documentation](https://www.coderabbit.ai/docs).
 
 ## Getting Started
 
