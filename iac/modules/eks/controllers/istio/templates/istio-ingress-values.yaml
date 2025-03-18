@@ -1,5 +1,9 @@
 service:
   type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/load-balancer-name: istio-ingress-lb
   ports:
   - name: http2
     port: 80
