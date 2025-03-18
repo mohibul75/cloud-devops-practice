@@ -33,7 +33,7 @@ spec:
       - name: regcred
       containers:
       - name: todo-application
-        image: ${DOCKER_REGISTRY}/todo-application:${VERSION}
+        image: ${DOCKER_REGISTRY}/application:${VERSION}
         ports:
         - containerPort: 3000
           name: http-port
