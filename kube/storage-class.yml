@@ -12,16 +12,3 @@ parameters:
   throughput: "125"
 reclaimPolicy: Delete
 allowVolumeExpansion: true
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongodb-pvc
-  namespace: dev
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ebs-sc
-  resources:
-    requests:
-      storage: 10Gi
