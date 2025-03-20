@@ -55,10 +55,33 @@ resource "aws_iam_role" "ebs_csi" {
   }
 }
 
-# Attach EBS CSI policy to role
+# Attach required EBS CSI policies
 resource "aws_iam_role_policy_attachment" "ebs_csi" {
   policy_arn = data.aws_iam_policy.ebs_csi_policy.arn
   role       = aws_iam_role.ebs_csi.name
+}
+
+resource "aws_iam_role_policy" "ebs_csi_extra" {
+  name = "ebs-csi-extra-${var.environment}"
+  role = aws_iam_role.ebs_csi.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeInstances",
+          "ec2:DescribeVolumes",
+          "ec2:CreateVolume",
+          "ec2:DeleteVolume",
+          "ec2:AttachVolume",
+          "ec2:DetachVolume"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 # Get latest EBS CSI driver version
@@ -67,7 +90,6 @@ data "aws_eks_addon_version" "ebs_csi" {
   kubernetes_version = aws_eks_cluster.main.version
   most_recent       = true
 }
-
 
 locals {
   all_addons = concat(var.addons, [
