@@ -153,6 +153,54 @@ resource "aws_iam_instance_profile" "worker_nodes" {
   role = aws_iam_role.node.name
 }
 
+# Launch template for EKS nodes
+resource "aws_launch_template" "eks_nodes" {
+  for_each = var.node_groups
+
+  name = "${local.name}-${each.key}-lt"
+  description = "Launch template for EKS managed node group"
+
+  vpc_security_group_ids = [aws_eks_cluster.main.vpc_config[0].cluster_security_group_id]
+
+  instance_type = each.value.instance_types[0]
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size = 20
+      volume_type = "gp3"
+      encrypted   = true
+    }
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "enabled"
+  }
+
+  monitoring {
+    enabled = true
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(
+      {
+        "Name" = "${local.name}-${each.key}",
+        "kubernetes.io/cluster/${aws_eks_cluster.main.name}" = "owned"
+      },
+      var.tags
+    )
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 # EKS Cluster
 resource "aws_eks_cluster" "main" {
   name     = local.name
@@ -204,17 +252,20 @@ resource "aws_eks_node_group" "main" {
     min_size     = each.value.scaling_config.min_size
   }
 
-  instance_types = each.value.instance_types
   capacity_type  = each.value.capacity_type
   ami_type       = "AL2023_x86_64_STANDARD"
-  disk_size      = 20
 
+  launch_template {
+    id      = aws_launch_template.eks_nodes[each.key].id
+    version = aws_launch_template.eks_nodes[each.key].latest_version
+  }
 
   depends_on = [
     aws_iam_role_policy_attachment.node_AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_AmazonEC2ContainerRegistryReadOnly,
-    aws_iam_role_policy_attachment.node_ebs_management
+    aws_iam_role_policy_attachment.node_ebs_management,
+    aws_launch_template.eks_nodes
   ]
 
   tags = merge(
@@ -227,4 +278,8 @@ resource "aws_eks_node_group" "main" {
     },
     var.tags
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
