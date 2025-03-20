@@ -76,14 +76,6 @@ locals {
       name = "aws-ebs-csi-driver"
       version = data.aws_eks_addon_version.ebs_csi.version
       service_account_role_arn = aws_iam_role.ebs_csi.arn
-      configuration_values = jsonencode({
-        controller = {
-          serviceAccount = {
-            create = true
-            name   = "ebs-csi-controller-sa"
-          }
-        }
-      })
     }
   ])
 }
