@@ -1,3 +1,10 @@
+resource "null_resource" "wait_for_eks" {
+  provisioner "local-exec" {
+    command = "until kubectl get ns kube-system; do sleep 10; done"
+  }
+  depends_on = [aws_eks_cluster.main, aws_eks_node_group.main]
+}
+
 # Create dev namespace
 resource "kubernetes_namespace" "dev_namespace" {
   metadata {
@@ -9,8 +16,8 @@ resource "kubernetes_namespace" "dev_namespace" {
 
   depends_on = [
     aws_eks_cluster.main,
-    aws_eks_node_group.main
-
+    aws_eks_node_group.main,
+    null_resource.wait_for_eks
   ]
 }
 
@@ -24,7 +31,7 @@ resource "kubernetes_namespace" "monitoring" {
   depends_on = [
     aws_eks_cluster.main,
     aws_eks_node_group.main,
-    kubernetes_namespace.dev_namespace
+    null_resource.wait_for_eks
   ]
 }
 
