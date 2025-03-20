@@ -98,6 +98,6 @@ jobs:
       working-directory: ./iac
 
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/*'
       run: terraform apply -auto-approve tfplan.plan
       working-directory: ./iac

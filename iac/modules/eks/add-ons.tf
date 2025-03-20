@@ -151,7 +151,8 @@ resource "kubernetes_manifest" "metric_server" {
 
 module "loki" {
   source = "./controllers/loki"
-  chart_version = "2.9.10"
+  loki_chart_version = "6.28.0"
+  promtail_chart_version = "6.16.6"
   monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
   storage_class = "ebs-sc"
   cluster_name = aws_eks_cluster.main.id
