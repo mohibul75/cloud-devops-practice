@@ -116,6 +116,29 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_full_access" {
     role       = aws_iam_role.node.name
 }
 
+resource "aws_iam_role_policy" "node_imds" {
+  name = "${local.name}-Worker-IMDS-Policy"
+  role = aws_iam_role.node.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeInstances"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "node_imds" {
+  policy_arn = aws_iam_role_policy.node_imds.arn
+  role       = aws_iam_role.node.name
+}
+
 # Create instance profile for worker nodes
 resource "aws_iam_instance_profile" "worker_nodes" {
   name = "${local.name}-Worker-Profile"
@@ -183,6 +206,7 @@ resource "aws_eks_node_group" "main" {
     aws_iam_role_policy_attachment.node_AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.node_imds
   ]
 
   tags = merge(
