@@ -116,6 +116,37 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_full_access" {
     role       = aws_iam_role.node.name
 }
 
+# EBS volume management policy for node role
+resource "aws_iam_policy" "ebs_management" {
+  name = "eks-ebs-management-${var.environment}"
+  description = "Allows EKS nodes to manage EBS volumes"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid = "VisualEditor0"
+      Effect = "Allow"
+      Action = [
+        "ec2:CreateVolume",
+        "ec2:DeleteVolume",
+        "ec2:DetachVolume",
+        "ec2:AttachVolume",
+        "ec2:DescribeInstances",
+        "ec2:CreateTags",
+        "ec2:DeleteTags",
+        "ec2:DescribeTags",
+        "ec2:DescribeVolumes"
+      ]
+      Resource = "*"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "node_ebs_management" {
+  policy_arn = aws_iam_policy.ebs_management.arn
+  role       = aws_iam_role.node.name
+}
+
 # Create instance profile for worker nodes
 resource "aws_iam_instance_profile" "worker_nodes" {
   name = "${local.name}-Worker-Profile"
@@ -182,7 +213,8 @@ resource "aws_eks_node_group" "main" {
   depends_on = [
     aws_iam_role_policy_attachment.node_AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.node_AmazonEC2ContainerRegistryReadOnly
+    aws_iam_role_policy_attachment.node_AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.node_ebs_management
   ]
 
   tags = merge(
