@@ -66,7 +66,6 @@ locals {
   all_addons = concat(var.addons, [
     {
       name = "aws-ebs-csi-driver"
-      version = "v1.25.0-eksbuild.1"
       service_account_role_arn = aws_iam_role.ebs_csi.arn
       configuration_values = jsonencode({
         controller = {
