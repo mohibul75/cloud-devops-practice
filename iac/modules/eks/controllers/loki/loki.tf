@@ -1,7 +1,7 @@
 resource "helm_release" "loki" {
   name       = "loki"
   repository = "https://grafana.github.io/helm-charts"
-  chart      = "grafana/loki"
+  chart      = "loki"
   version    = var.loki_chart_version
   namespace  = var.monitoring_namespace
 
@@ -16,7 +16,7 @@ resource "helm_release" "loki" {
 resource "helm_release" "promtail" {
   name       = "promtail"
   repository = "https://grafana.github.io/helm-charts"
-  chart      = "grafana/promtail"
+  chart      = "promtail"
   version    = var.promtail_chart_version
   namespace  = var.monitoring_namespace
 
