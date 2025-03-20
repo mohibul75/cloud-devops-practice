@@ -17,9 +17,6 @@ variable "addons" {
       name    = "coredns"
     },
     {
-      name    = "aws-ebs-csi-driver"
-    },
-    {
       name    = "aws-efs-csi-driver"
     }
   ]
