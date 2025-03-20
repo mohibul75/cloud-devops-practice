@@ -9,6 +9,13 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  EKS_CLUSTER_NAME: infra-practice-dev
+
 jobs:
   deploy-infrastructure:
     runs-on: ubuntu-latest
@@ -24,7 +31,7 @@ jobs:
           role-session-name: GitHubActionsSession
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
 
       - name: Deploy Storage Class
         run: |
