@@ -1,23 +1,9 @@
 loki:
   auth_enabled: false
-
-  persistence:
-    enabled: true
-    storageClassName: ${storage_class}
-    size: 5Gi
-    accessModes:
-      - ReadWriteOnce
-
-  # resources:
-  #   limits:
-  #     cpu: "1"
-  #     memory: 1Gi
-  #   requests:
-  #     cpu: 500m
-  #     memory: 512Mi
-
-  config:
-    storage_config:
+  commonConfig:
+    path_prefix: /var/loki
+    replication_factor: 1
+    storage:
       filesystem:
         chunks_directory: /var/loki/chunks
     schema_config:
@@ -29,6 +15,13 @@ loki:
           index:
             prefix: index_
             period: 24h
+
+persistence:
+  enabled: true
+  storageClassName: ${storage_class}
+  size: 5Gi
+  accessModes:
+    - ReadWriteOnce
 
 minio:
   enabled: false
@@ -64,6 +57,10 @@ chunksCache:
   allocatedMemory: 500
 
 monitoring:
+  selfMonitoring:
+    enabled: false
+  lokiCanary:
+    enabled: false
   serviceMonitor:
     enabled: false
     metricsInstance:
