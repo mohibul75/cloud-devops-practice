@@ -62,10 +62,19 @@ resource "aws_iam_role_policy_attachment" "ebs_csi" {
   role       = aws_iam_role.ebs_csi.name
 }
 
+# Get latest EBS CSI driver version
+data "aws_eks_addon_version" "ebs_csi" {
+  addon_name         = "aws-ebs-csi-driver"
+  kubernetes_version = aws_eks_cluster.main.version
+  most_recent       = true
+}
+
+
 locals {
   all_addons = concat(var.addons, [
     {
       name = "aws-ebs-csi-driver"
+      version = data.aws_eks_addon_version.ebs_csi.version
       service_account_role_arn = aws_iam_role.ebs_csi.arn
       configuration_values = jsonencode({
         controller = {
