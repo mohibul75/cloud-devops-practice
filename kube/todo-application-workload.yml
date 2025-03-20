@@ -34,6 +34,9 @@ spec:
       containers:
       - name: todo-application
         image: ${DOCKER_REGISTRY}/application:${VERSION}
+        volumeMounts:
+        - name: todo-data
+          mountPath: /app/data
         ports:
         - containerPort: 3000
           name: http-port
@@ -74,6 +77,27 @@ spec:
           successThreshold: 1
           timeoutSeconds: 5
         imagePullPolicy: Always
+      volumes:
+      - name: todo-data
+        persistentVolumeClaim:
+          claimName: todo-app-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: todo-app-pvc
+  namespace: dev
+  labels:
+    app.kubernetes.io/name: todo-application
+    app.kubernetes.io/instance: dev
+    app.kubernetes.io/part-of: todo-application
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources:
+    requests:
+      storage: 2Gi
 ---
 apiVersion: v1
 kind: Service

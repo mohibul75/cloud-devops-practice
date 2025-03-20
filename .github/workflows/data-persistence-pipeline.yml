@@ -1,0 +1,42 @@
+name: Data Persistence Pipeline
+
+on:
+  push:
+    paths:
+      - 'kube/storage-class.yml'
+      - 'kube/mongodb-statefulset.yml'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: GitHubActionsSession
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+      - name: Deploy Storage Class
+        run: |
+            kubectl apply -f kube/storage-class.yml
+            kubectl wait --for=condition=Available storageclass/ebs-sc --timeout=60s
+
+      - name: Deploy MongoDB
+        run: |
+          kubectl apply -f kube/mongodb-statefulset.yml
+          kubectl -n dev wait --for=condition=Ready pod/mongodb-0 --timeout=300s
+
+      - name: Verify MongoDB Status
+        run: |
+          kubectl -n dev get pods -l app=mongodb
+          kubectl -n dev get pvc -l app=mongodb
