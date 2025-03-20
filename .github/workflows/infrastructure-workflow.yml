@@ -8,12 +8,6 @@ on:
     paths:
       - 'iac/**'
       - '.github/workflows/infrastructure-workflow.yml'
-  pull_request:
-    branches: 
-      - main
-    paths:
-      - 'iac/**'
-      - '.github/workflows/infrastructure-workflow.yml'
   workflow_dispatch:
 
 
