@@ -3,8 +3,9 @@ name: Data Persistence Pipeline
 on:
   push:
     paths:
-      - 'kube/storage-class.yml'
-      - 'kube/mongodb-statefulset.yml'
+    - '.github/workflows/data-persistence-pipeline.yml'
+    - 'kube/storage-class.yml'
+    - 'kube/mongodb-statefulset.yml'
     branches:
       - main
   workflow_dispatch:
