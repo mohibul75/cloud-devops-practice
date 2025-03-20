@@ -30,9 +30,4 @@ resource "helm_release" "loki" {
     name  = "promtail.config.lokiAddress"
     value = "http://loki:3100/loki/api/v1/push"
   }
-
-  depends_on = [
-    kubernetes_namespace.monitoring,
-    helm_release.grafana
-  ]
 }
