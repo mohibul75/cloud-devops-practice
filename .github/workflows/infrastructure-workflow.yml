@@ -8,6 +8,7 @@ on:
     paths:
       - 'iac/**'
       - '.github/workflows/infrastructure-workflow.yml'
+
   workflow_dispatch:
 
 
