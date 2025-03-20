@@ -91,6 +91,9 @@ metadata:
     app.kubernetes.io/name: todo-application
     app.kubernetes.io/instance: dev
     app.kubernetes.io/part-of: todo-application
+  annotations:
+    volume.beta.kubernetes.io/storage-provisioner: ebs.csi.aws.com
+    volume.kubernetes.io/storage-class: ebs-sc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -98,6 +101,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
+  volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: Service
