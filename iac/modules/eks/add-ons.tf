@@ -148,3 +148,11 @@ resource "kubernetes_manifest" "metric_server" {
     aws_eks_addon.addons
   ]
 }
+
+module "loki" {
+  source = "./controllers/loki"
+  chart_version = "2.9.10"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+  cluster_name = aws_eks_cluster.main.id
+}

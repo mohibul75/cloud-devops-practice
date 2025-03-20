@@ -1,0 +1,30 @@
+image:
+  registry: docker.io
+  repository: grafana/promtail
+  tag: 3.4.2
+
+# Configuration
+config:
+  clients:
+    - url: ${loki_address}
+  snippets:
+    pipelineStages:
+      - docker: {}
+
+# Resource configuration
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+tolerations:
+  - operator: Exists
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true

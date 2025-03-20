@@ -10,6 +10,12 @@ variable "loki_version" {
   default     = "2.9.10"
 }
 
+variable "chart_version" {
+  description = "Loki Helm chart version"
+  type        = string
+  default     = "2.9.10"
+}
+
 variable "storage_class" {
   description = "Storage class to use for persistent volumes"
   type        = string

@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - main
+      - features/*
     paths:
       - 'iac/**'
       - '.github/workflows/infrastructure-workflow.yml'

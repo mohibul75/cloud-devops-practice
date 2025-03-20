@@ -1,9 +1,9 @@
 resource "helm_release" "loki" {
   name       = "loki"
   repository = "https://grafana.github.io/helm-charts"
-  chart      = "loki-stack"
+  chart      = "grafana/loki"
+  version    = var.chart_version
   namespace  = var.monitoring_namespace
-  version    = var.loki_version
 
   values = [
     templatefile("${path.module}/templates/loki-values.yaml", {
@@ -11,23 +11,25 @@ resource "helm_release" "loki" {
     })
   ]
 
-  set {
-    name  = "loki.persistence.enabled"
-    value = "true"
-  }
+  depends_on = [
+    kubernetes_namespace.monitoring
+  ]
+}
 
-  set {
-    name  = "loki.persistence.size"
-    value = "5Gi"
-  }
+resource "helm_release" "promtail" {
+  name       = "promtail"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "grafana/promtail"
+  version    = var.chart_version
+  namespace  = var.monitoring_namespace
 
-  set {
-    name  = "promtail.enabled"
-    value = "true"
-  }
+  values = [
+    templatefile("${path.module}/templates/promtail.yaml", {
+      loki_address = "http://loki:3100/loki/api/v1/push"
+    })
+  ]
 
-  set {
-    name  = "promtail.config.lokiAddress"
-    value = "http://loki:3100/loki/api/v1/push"
-  }
+  depends_on = [
+    helm_release.loki
+  ]
 }
