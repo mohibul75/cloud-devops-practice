@@ -60,7 +60,7 @@ jobs:
         # Fetch node group configuration from parameter store
         export NODE_GROUPS=$(aws ssm get-parameter --name "/eks/iac/dev/node_groups" --query "Parameter.Value" --output text)
         
-        # Create tags JSON from parameter store
+        # Fetch tags from parameter store
         export TAGS=$(aws ssm get-parameter --name "/eks/iac/dev/tags" --query "Parameter.Value" --output text)
 
         # Create terraform.tfvars file
@@ -93,6 +93,6 @@ jobs:
       working-directory: ./iac
 
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/*'
+      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/feature/')
       run: terraform apply -auto-approve tfplan.plan
       working-directory: ./iac
