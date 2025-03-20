@@ -36,7 +36,7 @@ jobs:
       - name: Deploy Storage Class
         run: |
             kubectl apply -f kube/storage-class.yml
-            kubectl wait --for=condition=Available storageclass/ebs-sc --timeout=60s
+            kubectl get storageclass/ebs-sc
 
       - name: Deploy MongoDB
         run: |
