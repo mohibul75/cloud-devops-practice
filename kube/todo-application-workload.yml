@@ -117,7 +117,7 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 8080
+  - port: 3000
     name: http
     protocol: TCP
     targetPort: 3000
@@ -126,7 +126,7 @@ spec:
     app.kubernetes.io/instance: dev
     app.kubernetes.io/part-of: todo-application
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: Gateway
 metadata:
   name: todo-application-gateway
@@ -142,20 +142,7 @@ spec:
     hosts:
     - "*"
 ---
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: todo-application-service-dr
-  namespace: dev
-spec:
-  host: todo-application-service
-  subsets:
-    - labels:
-        app.kubernetes.io/name: todo-application
-        app.kubernetes.io/instance: dev
-      name: v1
----
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: todo-application-virtualservice
@@ -171,4 +158,4 @@ spec:
         host: todo-application-service
         subset: v1
         port:
-          number: 8080
+          number: 3000
