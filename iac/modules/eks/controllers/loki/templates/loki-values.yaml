@@ -1,20 +1,35 @@
 loki:
   auth_enabled: false
-  commonConfig:
-    path_prefix: /var/loki
-    replication_factor: 1
-    storage:
-      filesystem:
-        chunks_directory: /var/loki/chunks
+  config: |
+    auth_enabled: false
+    server:
+      http_listen_port: 3100
+
+    common:
+      path_prefix: /var/loki
+      storage:
+        filesystem:
+          chunks_directory: /var/loki/chunks
+      replication_factor: 1
+
     schema_config:
       configs:
-        - from: "2023-01-01"
+        - from: 2023-01-01
           store: boltdb-shipper
           object_store: filesystem
           schema: v12
           index:
             prefix: index_
             period: 24h
+
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /var/loki/index
+        cache_location: /var/loki/cache
+        shared_store: filesystem
+
+singleBinary:
+  replicas: 1
 
 persistence:
   enabled: true
@@ -23,13 +38,16 @@ persistence:
   accessModes:
     - ReadWriteOnce
 
+monitoring:
+  selfMonitoring:
+    enabled: false
+  lokiCanary:
+    enabled: false
+  serviceMonitor:
+    enabled: false
+
 minio:
   enabled: false
-      
-deploymentMode: SingleBinary
-
-singleBinary:
-  replicas: 1
 
 gateway:
   enabled: false
@@ -55,16 +73,6 @@ write:
 
 chunksCache:
   allocatedMemory: 500
-
-monitoring:
-  selfMonitoring:
-    enabled: false
-  lokiCanary:
-    enabled: false
-  serviceMonitor:
-    enabled: false
-    metricsInstance:
-      enabled: false
 
 serviceMonitor:
   enabled: false
