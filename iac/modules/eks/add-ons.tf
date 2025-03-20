@@ -40,6 +40,13 @@ module "istio" {
   cluster_name = aws_eks_cluster.main.id
   istio_version = "1.25.0"
   kiali_version = "1.40.0"
+
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main,
+    kubernetes_namespace.monitoring,
+    aws_eks_addon.addons
+  ]
 }
 
 data "http" "metric_server" {
@@ -54,6 +61,9 @@ resource "kubernetes_manifest" "metric_server" {
   for_each = { for idx, manifest in compact(local.metrics_server_manifests) : idx => manifest if manifest != "" }
   manifest = yamldecode(each.value)
   depends_on = [
-    kubernetes_namespace.monitoring
+    aws_eks_cluster.main,
+    aws_eks_node_group.main,
+    kubernetes_namespace.monitoring,
+    aws_eks_addon.addons
   ]
 }

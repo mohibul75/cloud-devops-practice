@@ -6,6 +6,12 @@ resource "kubernetes_namespace" "dev_namespace" {
       "namespace" = "dev"
     }
   }
+
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main
+
+  ]
 }
 
 resource "kubernetes_namespace" "monitoring" {
@@ -15,6 +21,11 @@ resource "kubernetes_namespace" "monitoring" {
       "namespace" = "monitoring"
     }
   }
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main,
+    kubernetes_namespace.dev_namespace
+  ]
 }
 
 # Create Docker registry secret
@@ -38,5 +49,9 @@ resource "kubernetes_secret" "docker_registry" {
     })
   }
 
-  depends_on = [kubernetes_namespace.dev_namespace]
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main,
+    kubernetes_namespace.dev_namespace
+  ]
 }
