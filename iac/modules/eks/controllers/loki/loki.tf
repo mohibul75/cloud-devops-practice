@@ -11,9 +11,6 @@ resource "helm_release" "loki" {
     })
   ]
 
-  depends_on = [
-    kubernetes_namespace.monitoring
-  ]
 }
 
 resource "helm_release" "promtail" {
