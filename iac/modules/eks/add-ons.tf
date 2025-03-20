@@ -3,7 +3,6 @@ variable "addons" {
     name                    = string
     version                 = optional(string)
     service_account_role_arn = optional(string)
-    configuration_values    = optional(string)
   }))
 
   default = [
@@ -86,7 +85,6 @@ resource "aws_eks_addon" "addons" {
   addon_name        = each.value.name
   addon_version     = each.value.version
   service_account_role_arn = each.value.service_account_role_arn
-  configuration_values = each.value.configuration_values
   resolve_conflicts_on_update = "PRESERVE"
   
   depends_on = [
