@@ -1,5 +1,6 @@
 loki:
   auth_enabled: false
+  useTestSchema: true
   config: |
     auth_enabled: false
     server:
@@ -11,22 +12,6 @@ loki:
         filesystem:
           chunks_directory: /var/loki/chunks
       replication_factor: 1
-
-    schema_config:
-      configs:
-        - from: 2023-01-01
-          store: boltdb-shipper
-          object_store: filesystem
-          schema: v12
-          index:
-            prefix: index_
-            period: 24h
-
-    storage_config:
-      boltdb_shipper:
-        active_index_directory: /var/loki/index
-        cache_location: /var/loki/cache
-        shared_store: filesystem
 
 singleBinary:
   replicas: 1
@@ -45,37 +30,3 @@ monitoring:
     enabled: false
   serviceMonitor:
     enabled: false
-
-minio:
-  enabled: false
-
-gateway:
-  enabled: false
-
-sidecar:
-  image:
-    repository: kiwigrid/k8s-sidecar
-    tag: 1.30.0
-  resources:
-    requests:
-      cpu: 50m
-      memory: 50Mi
-    limits:
-      cpu: 100m
-      memory: 100Mi
-
-backend:
-  replicas: 0
-read:
-  replicas: 0
-write:
-  replicas: 0
-
-chunksCache:
-  allocatedMemory: 500
-
-serviceMonitor:
-  enabled: false
-
-service:
-  type: ClusterIP
