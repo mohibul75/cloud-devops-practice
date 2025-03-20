@@ -189,8 +189,7 @@ resource "aws_launch_template" "eks_nodes" {
     resource_type = "instance"
     tags = merge(
       {
-        "Name" = "${local.name}-${each.key}",
-        "kubernetes.io/cluster/${aws_eks_cluster.main.name}" = "owned"
+        "Name" = "${local.name}-${each.key}"
       },
       var.tags
     )
@@ -270,11 +269,7 @@ resource "aws_eks_node_group" "main" {
 
   tags = merge(
     {
-      "Name" = "${local.name}-${each.key}",
-      "kubernetes.io/cluster/${aws_eks_cluster.main.name}" = "owned",
-      "k8s.io/cluster-autoscaler/${aws_eks_cluster.main.name}" = "owned",
-      "eks:cluster-name" = aws_eks_cluster.main.name,
-      "aws:eks:cluster-name" = aws_eks_cluster.main.name
+      "Name" = "${local.name}-${each.key}"
     },
     var.tags
   )
