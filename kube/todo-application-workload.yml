@@ -43,11 +43,21 @@ spec:
         - containerPort: 3000
           name: http-port
         env:
-        - name: MONGODB_URI
+        - name: MONGODB_HOST
           valueFrom:
             secretKeyRef:
               name: todo-app-mongodb-secret
               key: host
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: password
         resources:
           requests:
             memory: "64Mi"

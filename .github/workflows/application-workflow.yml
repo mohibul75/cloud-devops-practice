@@ -75,7 +75,7 @@ jobs:
           export DOCKER_REGISTRY="${{ secrets.DOCKERHUB_USERNAME }}"
           export MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}
           export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
-          export MONGODB_URI=mongodb://$MONGODB_USERNAME:$MONGODB_PASSWORD@mongodb.dev.svc.cluster.local:27017/todos?authSource=admin
+          export MONGODB_HOST=mongodb.dev.svc.cluster.local
 
           # Store the current revision for potential rollback
           CURRENT_REVISION=$(kubectl get deployment todo-application-deployment -n dev -o=jsonpath='{.metadata.annotations.kubernetes\.io/change-cause}' || echo "")
