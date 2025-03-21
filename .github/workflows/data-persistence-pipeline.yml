@@ -43,8 +43,8 @@ jobs:
 
       - name: Deploy MongoDB
         run: |
-          export MONGODB_USERNAME= ${{ secrets.MONGODB_USERNAME }}
-          export MONGODB_PASSWORD= ${{ secrets.MONGODB_PASSWORD }}
+          export MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}
+          export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
           cat kube/mongodb-statefulset.yml | envsubst | kubectl apply -f -
           kubectl -n dev wait --for=condition=Ready pod/mongodb-0 --timeout=300s
 
