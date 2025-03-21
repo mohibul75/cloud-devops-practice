@@ -8,6 +8,8 @@ on:
     - 'kube/mongodb-statefulset.yml'
     branches:
       - main
+      - fix/*
+      - feature/*
   workflow_dispatch:
 
 permissions:
@@ -35,13 +37,11 @@ jobs:
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
 
       - name: Deploy Storage Class
-        if: contains(github.event.push.paths, 'kube/storage-class.yml')
         run: |
             kubectl apply -f kube/storage-class.yml
             kubectl get storageclass/ebs-sc
 
       - name: Deploy MongoDB
-        if: contains(github.event.push.paths, 'kube/mongodb-statefulset.yml')
         run: |
           kubectl apply -f kube/mongodb-statefulset.yml
           kubectl -n dev wait --for=condition=Ready pod/mongodb-0 --timeout=300s

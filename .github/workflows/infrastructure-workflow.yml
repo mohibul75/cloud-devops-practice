@@ -5,6 +5,7 @@ on:
     branches: 
       - main
       - feature/*
+      - fix/*
     paths:
       - 'iac/**'
       - '.github/workflows/infrastructure-workflow.yml'
@@ -94,6 +95,6 @@ jobs:
       working-directory: ./iac
 
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/feature/')
+      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')
       run: terraform apply -auto-approve tfplan.plan
       working-directory: ./iac

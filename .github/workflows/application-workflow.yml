@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feature/*
+      - fix/*
     paths:
       - 'app/**'
       - 'kube/todo-application-workload.yml'
