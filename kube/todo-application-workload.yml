@@ -155,7 +155,10 @@ spec:
   gateways:
   - todo-application-gateway
   http:
-  - route:
+  - match:
+    - uri:
+        prefix: /
+    route:
     - destination:
         host: todo-application-service
         port:
@@ -168,8 +171,6 @@ metadata:
   namespace: dev
 spec:
   host: todo-application-service
-  subsets:
-  - name: v1
-    labels:
-      app.kubernetes.io/name: todo-application
-      app.kubernetes.io/instance: dev
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
