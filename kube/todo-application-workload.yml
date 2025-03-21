@@ -28,6 +28,8 @@ spec:
         app.kubernetes.io/managed-by: github-actions
         app.kubernetes.io/version: "${VERSION}"
         azure.workload.identity/use: "true"
+      annotations:
+        sidecar.istio.io/inject: "true"
     spec:
       imagePullSecrets:
       - name: regcred
@@ -156,6 +158,18 @@ spec:
   - route:
     - destination:
         host: todo-application-service
-        subset: v1
         port:
           number: 3000
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: todo-application-destination
+  namespace: dev
+spec:
+  host: todo-application-service
+  subsets:
+  - name: v1
+    labels:
+      app.kubernetes.io/name: todo-application
+      app.kubernetes.io/instance: dev

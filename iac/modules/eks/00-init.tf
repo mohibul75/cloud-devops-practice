@@ -4,6 +4,7 @@ resource "kubernetes_namespace" "dev_namespace" {
     name = "dev"
     labels = {
       "namespace" = "dev"
+      "istio-injection" = "enabled"
     }
   }
 
