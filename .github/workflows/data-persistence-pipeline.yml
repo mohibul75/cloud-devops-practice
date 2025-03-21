@@ -43,10 +43,10 @@ jobs:
 
       - name: Deploy MongoDB
         run: |
-          cat kube/mongodb-statefulset.yml | envsubst | kubectl apply -f -
-          kubectl -n db wait --for=condition=Ready pod/mongodb-0 --timeout=300s
+          kubectl apply -f kube/mongodb-statefulset.yml
+          kubectl -n dev wait --for=condition=Ready pod/mongodb-0 --timeout=300s
 
       - name: Verify MongoDB Status
         run: |
-          kubectl -n db get pods -l app=mongodb
-          kubectl -n db get pvc -l app=mongodb
+          kubectl -n dev get pods -l app=mongodb
+          kubectl -n dev get pvc -l app=mongodb
