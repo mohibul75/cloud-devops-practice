@@ -14,10 +14,10 @@ variable "addons" {
     },
     {
       name    = "coredns"
-    },
-    {
-      name    = "aws-efs-csi-driver"
     }
+    # {
+    #   name    = "aws-efs-csi-driver"
+    # }
   ]
 }
 
