@@ -157,3 +157,11 @@ module "loki" {
   storage_class = "ebs-sc"
   cluster_name = aws_eks_cluster.main.id
 }
+
+module "prometheus" {
+  source = "./controllers/prometheus"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+  cluster_name = aws_eks_cluster.main.id
+  prometheus_version = "27.6.0"
+}
