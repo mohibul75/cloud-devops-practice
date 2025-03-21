@@ -44,17 +44,10 @@ spec:
           name: http-port
         env:
         - name: MONGODB_URI
-          value: "mongodb://$(MONGODB_USERNAME):$(MONGODB_PASSWORD)@mongodb.dev.svc.cluster.local:27017/todos?authSource=admin"
-        - name: MONGODB_USERNAME
           valueFrom:
             secretKeyRef:
               name: todo-app-mongodb-secret
-              key: username
-        - name: MONGODB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: todo-app-mongodb-secret
-              key: password
+              key: host
         resources:
           requests:
             memory: "64Mi"
