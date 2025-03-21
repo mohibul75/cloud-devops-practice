@@ -9,6 +9,7 @@ resource "helm_release" "grafana" {
     templatefile("${path.module}/templates/grafana-values.yaml", {
       storage_class = var.storage_class
       admin_password = var.grafana_admin_password
+      namespace = var.monitoring_namespace
     })
   ]
 }
