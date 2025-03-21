@@ -7,7 +7,7 @@ variable "monitoring_namespace" {
 variable "grafana_version" {
   description = "Grafana Helm chart version"
   type        = string
-  default     = "9.5.1"
+  default     = "8.10.4"
 }
 
 variable "storage_class" {
@@ -20,4 +20,19 @@ variable "grafana_admin_password" {
   description = "Grafana admin password"
   type        = string
   sensitive   = true
+}
+
+variable "tempo_endpoint" {
+  description = "Tempo service endpoint for Grafana data source"
+  type        = string
+}
+
+variable "prometheus_endpoint" {
+  description = "Prometheus service endpoint for Grafana data source"
+  type        = string
+}
+
+variable "loki_endpoint" {
+  description = "Loki service endpoint for Grafana data source"
+  type        = string
 }

@@ -10,6 +10,9 @@ resource "helm_release" "grafana" {
       storage_class = var.storage_class
       admin_password = var.grafana_admin_password
       namespace = var.monitoring_namespace
+      tempo_endpoint = var.tempo_endpoint
+      prometheus_endpoint = var.prometheus_endpoint
+      loki_endpoint = var.loki_endpoint
     })
   ]
 }

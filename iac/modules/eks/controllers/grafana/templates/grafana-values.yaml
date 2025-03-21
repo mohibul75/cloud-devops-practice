@@ -49,16 +49,16 @@ datasources:
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://prometheus-kube-prometheus-prometheus.${namespace}.svc.cluster.local:9090
+        url: ${prometheus_endpoint}
         access: proxy
         isDefault: true
       - name: Loki
         type: loki
-        url: http://loki-gateway.${namespace}.svc.cluster.local
+        url: ${loki_endpoint}
         access: proxy
       - name: Tempo
         type: tempo
-        url: http://tempo.${namespace}.svc.cluster.local:3200
+        url: ${tempo_endpoint}
         access: proxy
         jsonData:
           tracesToLogs:

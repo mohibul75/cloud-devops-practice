@@ -179,4 +179,7 @@ module "grafana" {
   storage_class = "ebs-sc"
   grafana_version = "8.10.4"
   grafana_admin_password = var.grafana_admin_password
+  tempo_endpoint = module.tempo.tempo_endpoint
+  prometheus_endpoint = module.prometheus.prometheus_endpoint
+  loki_endpoint = module.loki.loki_endpoint
 }
