@@ -165,3 +165,10 @@ module "prometheus" {
   cluster_name = aws_eks_cluster.main.id
   prometheus_version = "70.1.1"
 }
+
+module "tempo" {
+  source = "./controllers/tempo"
+  tempo_version = "1.18.3"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+}
