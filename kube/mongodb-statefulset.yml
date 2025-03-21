@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongodb
-  namespace: dev
+  namespace: db
 spec:
   serviceName: mongodb
   replicas: 1
@@ -76,7 +76,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
-  namespace: dev
+  namespace: db
   labels:
     app: mongodb
 spec:
@@ -91,8 +91,8 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongodb-secret
-  namespace: dev
+  namespace: db
 type: Opaque
 stringData:
-  username: mongoadmin
-  password: secret123
+  username: ${username}
+  password: ${password}
