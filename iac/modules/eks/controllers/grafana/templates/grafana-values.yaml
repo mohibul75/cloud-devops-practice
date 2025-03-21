@@ -1,4 +1,5 @@
-adminPassword: ${admin_password}
+admin:
+  password: ${admin_password}
 
 persistence:
   type: pvc
@@ -6,7 +7,7 @@ persistence:
   storageClassName: ${storage_class}
   accessModes:
     - ReadWriteOnce
-  size: 10Gi
+  size: 2Gi
 
 service:
   type: LoadBalancer
@@ -42,10 +43,43 @@ dashboards:
       revision: 3
       datasource: Prometheus
 
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-kube-prometheus-prometheus.${namespace}.svc.cluster.local:9090
+        access: proxy
+        isDefault: true
+      - name: Loki
+        type: loki
+        url: http://loki-gateway.${namespace}.svc.cluster.local
+        access: proxy
+      - name: Tempo
+        type: tempo
+        url: http://tempo.${namespace}.svc.cluster.local:3200
+        access: proxy
+        jsonData:
+          tracesToLogs:
+            datasourceUid: Loki
+            tags: ['job', 'instance', 'pod', 'namespace']
+            mappedTags: [{ key: 'service.name', value: 'service' }]
+            spanStartTimeShift: '-1h'
+            spanEndTimeShift: '1h'
+            filterByTraceID: true
+            filterBySpanID: false
+          serviceMap:
+            datasourceUid: prometheus
+
+# plugins:
+#   - grafana-piechart-panel
+#   - grafana-clock-panel
+
 serviceMonitor:
-  enabled: true
+  enabled: false
 
 sidecar:
   dashboards:
-    enabled: true
+    enabled: false
     searchNamespace: ALL

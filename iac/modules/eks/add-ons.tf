@@ -172,3 +172,11 @@ module "tempo" {
   monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
   storage_class = "ebs-sc"
 }
+
+module "grafana" {
+  source = "./controllers/grafana"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+  grafana_version = "8.10.4"
+  grafana_admin_password = var.grafana_admin_password
+}
