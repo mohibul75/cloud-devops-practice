@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: mongodb
+      annotations:
+        sidecar.istio.io/inject: "true"
     spec:
       containers:
       - name: mongodb
@@ -96,3 +98,16 @@ type: Opaque
 stringData:
   username: ${MONGODB_USERNAME}
   password: ${MONGODB_PASSWORD}
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: mongodb
+  namespace: dev
+spec:
+  host: mongodb
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: ROUND_ROBIN

@@ -73,6 +73,8 @@ jobs:
         run: |
           export VERSION="${{ env.IMAGE_TAG }}"
           export DOCKER_REGISTRY="${{ secrets.DOCKERHUB_USERNAME }}"
+          export MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}
+          export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
 
           # Store the current revision for potential rollback
           CURRENT_REVISION=$(kubectl get deployment todo-application-deployment -n dev -o=jsonpath='{.metadata.annotations.kubernetes\.io/change-cause}' || echo "")
