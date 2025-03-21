@@ -163,5 +163,5 @@ module "prometheus" {
   monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
   storage_class = "ebs-sc"
   cluster_name = aws_eks_cluster.main.id
-  prometheus_version = "27.6.0"
+  prometheus_version = "70.1.1"
 }

@@ -7,7 +7,7 @@ variable "monitoring_namespace" {
 variable "prometheus_version" {
   description = "Prometheus Helm chart version (kube-prometheus-stack)"
   type        = string
-  default     = "45.7.1"
+  default     = "70.1.1"
 }
 
 variable "storage_class" {
