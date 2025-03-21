@@ -3,6 +3,13 @@ variable "monitoring_namespace" {
   type        = string
   default     = "monitoring"
 }
+
+variable "prometheus_version" {
+  description = "Prometheus Helm chart version (kube-prometheus-stack)"
+  type        = string
+  default     = "70.1.1"
+}
+
 variable "storage_class" {
   description = "Storage class to use for persistent volumes"
   type        = string
@@ -12,16 +19,4 @@ variable "storage_class" {
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
-}
-
-variable "loki_chart_version" {
-  description = "Loki Helm chart version"
-  type        = string
-  default     = "2.9.10"
-}
-
-variable "promtail_chart_version" {
-  description = "Promtail Helm chart version"
-  type        = string
-  default     = "2.9.10"
 }

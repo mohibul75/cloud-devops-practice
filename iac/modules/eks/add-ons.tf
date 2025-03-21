@@ -14,10 +14,10 @@ variable "addons" {
     },
     {
       name    = "coredns"
-    },
-    {
-      name    = "aws-efs-csi-driver"
     }
+    # {
+    #   name    = "aws-efs-csi-driver"
+    # }
   ]
 }
 
@@ -147,4 +147,39 @@ resource "kubernetes_manifest" "metric_server" {
     kubernetes_namespace.monitoring,
     aws_eks_addon.addons
   ]
+}
+
+module "loki" {
+  source = "./controllers/loki"
+  loki_chart_version = "6.28.0"
+  promtail_chart_version = "6.16.6"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+  cluster_name = aws_eks_cluster.main.id
+}
+
+module "prometheus" {
+  source = "./controllers/prometheus"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+  cluster_name = aws_eks_cluster.main.id
+  prometheus_version = "70.1.1"
+}
+
+module "tempo" {
+  source = "./controllers/tempo"
+  tempo_version = "1.18.3"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+}
+
+module "grafana" {
+  source = "./controllers/grafana"
+  monitoring_namespace = kubernetes_namespace.monitoring.metadata[0].name
+  storage_class = "ebs-sc"
+  grafana_version = "8.10.4"
+  grafana_admin_password = var.grafana_admin_password
+  tempo_endpoint = module.tempo.tempo_endpoint
+  prometheus_endpoint = module.prometheus.prometheus_endpoint
+  loki_endpoint = module.loki.loki_endpoint
 }
