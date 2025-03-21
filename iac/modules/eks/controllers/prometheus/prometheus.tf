@@ -10,8 +10,4 @@ resource "helm_release" "prometheus" {
       storage_class = var.storage_class
     })
   ]
-
-  depends_on = [
-    kubernetes_namespace.monitoring
-  ]
 }
