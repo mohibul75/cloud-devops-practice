@@ -54,6 +54,7 @@ module "eks" {
   tags = var.tags
   dockerhub_username = var.dockerhub_username
   dockerhub_token = var.dockerhub_token
+  grafana_admin_password = var.grafana_admin_password
 }
 
 provider "kubernetes" {
