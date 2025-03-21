@@ -14,6 +14,21 @@ resource "kubernetes_namespace" "dev_namespace" {
   ]
 }
 
+# Create DB namespace
+resource "kubernetes_namespace" "db_namespace" {
+  metadata {
+    name = "db"
+    labels = {
+      "namespace" = "db"
+    }
+  }
+
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main
+  ]
+}
+
 # Create monitoring namespace
 resource "kubernetes_namespace" "monitoring" {
   metadata {
