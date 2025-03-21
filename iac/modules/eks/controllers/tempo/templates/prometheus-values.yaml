@@ -1,0 +1,90 @@
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: ${storage_class}
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
+    retention: 15d
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector: {}
+    podMonitorNamespaceSelector: {}
+    
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+
+alertmanager:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClass: ${storage_class}
+    size: 10Gi
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'null'
+      routes:
+      - match:
+          alertname: Watchdog
+        receiver: 'null'
+    receivers:
+    - name: 'null'
+
+grafana:
+  enabled: false  # We're using our own Grafana installation
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+  tolerations:
+    - operator: Exists
+
+defaultRules:
+  create: true
+  rules:
+    alertmanager: true
+    etcd: true
+    general: true
+    k8s: true
+    kubeApiserver: true
+    kubePrometheusNodeAlerting: true
+    kubePrometheusNodeRecording: true
+    kubernetesAbsent: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeScheduler: true
+    network: true
+    node: true
+    prometheus: true
+    prometheusOperator: true
+    time: true
+
+prometheusOperator:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true
+  tls:
+    enabled: false
