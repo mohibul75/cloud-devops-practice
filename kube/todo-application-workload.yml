@@ -98,20 +98,6 @@ spec:
           claimName: todo-app-pvc
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  name: todo-app-mongodb-secret
-  namespace: dev
-  labels:
-    app.kubernetes.io/name: todo-application
-    app.kubernetes.io/instance: dev
-    app.kubernetes.io/part-of: todo-application
-type: Opaque
-stringData:
-  username: ${MONGODB_USERNAME}
-  password: ${MONGODB_PASSWORD}
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: todo-app-pvc

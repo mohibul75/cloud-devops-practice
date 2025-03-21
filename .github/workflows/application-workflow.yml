@@ -80,6 +80,9 @@ jobs:
           CURRENT_REVISION=$(kubectl get deployment todo-application-deployment -n dev -o=jsonpath='{.metadata.annotations.kubernetes\.io/change-cause}' || echo "")
           echo "CURRENT_REVISION=$CURRENT_REVISION" >> $GITHUB_ENV
 
+          # Create MongoDB Secret
+          cat kube/app-secret.yml | envsubst | kubectl apply -f -
+
           # Apply application workload
           cat kube/todo-application-workload.yml | envsubst | kubectl apply -f -
 
