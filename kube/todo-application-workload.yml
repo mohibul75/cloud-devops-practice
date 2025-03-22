@@ -30,6 +30,9 @@ spec:
         azure.workload.identity/use: "true"
       annotations:
         sidecar.istio.io/inject: "true"
+        proxy.istio.io/config: |
+          terminationDrainDuration: 60s
+          holdApplicationUntilProxyStarts: true
     spec:
       imagePullSecrets:
       - name: regcred
@@ -42,6 +45,32 @@ spec:
         ports:
         - containerPort: 3000
           name: http-port
+        env:
+        - name: MONGODB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: host
+        - name: MONGODB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: port
+        - name: MONGODB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: database
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: password
         resources:
           requests:
             memory: "64Mi"
@@ -52,8 +81,8 @@ spec:
         startupProbe:
           exec:
             command:
-            - cat
-            - /proc/1/status
+            - ls
+            - /app
           periodSeconds: 10
           failureThreshold: 30
           successThreshold: 1

@@ -14,10 +14,92 @@ spec:
     metadata:
       labels:
         app: mongodb
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: mongodb
-        image: mongo:6.0
+        image: mongo:6.0.11
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          # Generate a secure keyfile with at least 6 characters
+          openssl rand -base64 756 > /data/db/keyfile
+          chmod 400 /data/db/keyfile
+
+          # Clean up any stale lock files
+          rm -f /data/db/mongod.lock
+
+          # Start MongoDB without auth for initialization
+          mongod --port 27017 --bind_ip_all --replSet myReplicaSet --fork --logpath /data/db/mongod.log
+
+          # Wait for MongoDB to start
+          until mongosh --port 27017 --eval "print('waiting...')" &>/dev/null; do
+            sleep 2
+            echo "Waiting for MongoDB to start..."
+          done
+          echo "MongoDB started"
+
+          printf "\n\t mongod: check and set master \n\n"
+          mongosh --port 27017 --eval '
+          try {
+            rs.status();
+          } catch (err) {
+            if (err.codeName === "NotYetInitialized") {
+              rs.initiate({
+                _id: "myReplicaSet",
+                members: [{ _id: 0, host: "mongodb-0.mongodb.dev.svc.cluster.local:27017", priority: 1 }],
+                settings: { electionTimeoutMillis: 2000 }
+              });
+            }
+          }'
+
+          # Wait for replica set to initialize
+          until mongosh --port 27017 --eval "rs.isMaster().ismaster" | grep -q "true"; do
+            sleep 2
+            echo "Waiting for replica set primary..."
+          done
+          echo "Replica set primary is ready"
+
+          printf "\n\t mongod: create admin user \n\n"
+          mongosh --port 27017 --eval '
+          try {
+            admin = db.getSiblingDB("admin");
+            admin.createUser({
+              user: "admin",
+              pwd: "Abc12345",
+              roles: [{ role: "root", db: "admin" }]
+            });
+          } catch (err) {
+            if (!err.message.includes("already exists")) {
+              throw err;
+            }
+          }'
+
+          printf "\n\t mongod: create todo database and user \n\n"
+          mongosh --port 27017 --eval '
+          try {
+            admin = db.getSiblingDB("admin");
+            admin.auth("admin", "Abc12345");
+            todos = db.getSiblingDB("todos");
+            todos.createUser({
+              user: "admin",
+              pwd: "Abc12345",
+              roles: [{ role: "readWrite", db: "todos" }]
+            });
+          } catch (err) {
+            if (!err.message.includes("already exists")) {
+              throw err;
+            }
+          }'
+
+          # Shutdown MongoDB
+          mongod --shutdown --dbpath /data/db
+
+          # Start MongoDB with auth enabled
+          exec mongod --port 27017 --bind_ip_all --replSet myReplicaSet --auth --keyFile /data/db/keyfile
         ports:
         - containerPort: 27017
           name: mongodb
@@ -26,42 +108,17 @@ spec:
           mountPath: /data/db
         env:
         - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: username
+          value: "admin"
         - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: password
-        # resources:
-        #   requests:
-        #     cpu: 100m
-        #     memory: 128Mi
-        #   limits:
-        #     cpu: 200m
-        #     memory: 256Mi
-        livenessProbe:
-          exec:
-            command:
-            - mongosh
-            - --eval
-            - "db.adminCommand('ping')"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 20
-        readinessProbe:
-          exec:
-            command:
-            - mongosh
-            - --eval
-            - "db.adminCommand('ping')"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 20
+          value: "Abc12345"
+        - name: MONGO_REPLICA_SET
+          value: "myReplicaSet"
+        - name: MONGO_PORT
+          value: "27017"
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-data-mongodb-0
   volumeClaimTemplates:
   - metadata:
       name: mongodb-data
@@ -94,5 +151,5 @@ metadata:
   namespace: dev
 type: Opaque
 stringData:
-  username: ${MONGODB_USERNAME}
-  password: ${MONGODB_PASSWORD}
+  username: "admin"
+  password: "Abc12345"
