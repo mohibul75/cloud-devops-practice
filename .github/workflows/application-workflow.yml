@@ -73,8 +73,8 @@ jobs:
         run: |
           export VERSION="${{ env.IMAGE_TAG }}"
           export DOCKER_REGISTRY="${{ secrets.DOCKERHUB_USERNAME }}"
-          export MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}
-          export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
+          export MONGODB_USERNAME="${{ secrets.MONGODB_USERNAME }}"
+          export MONGODB_PASSWORD="${{ secrets.MONGODB_PASSWORD }}"
           export MONGODB_HOST=mongodb.dev.svc.cluster.local
 
           # Store the current revision for potential rollback
@@ -82,7 +82,10 @@ jobs:
           echo "CURRENT_REVISION=$CURRENT_REVISION" >> $GITHUB_ENV
 
           # Create MongoDB Secret
-          cat kube/app-secret.yml | envsubst | kubectl apply -f -
+          envsubst < kube/app-secret.yml | kubectl apply -f -
+
+          # Verify secret was created
+          kubectl get secret todo-app-mongodb-secret -n dev -o yaml
 
           # Apply application workload
           cat kube/todo-application-workload.yml | envsubst | kubectl apply -f -
