@@ -190,3 +190,169 @@ Common issues and solutions:
 For issues or questions about the pipeline:
 - Create a GitHub issue
 - Contact the DevOps team
+
+# Infrastructure CI/CD Pipeline
+
+This document details the Terraform-based infrastructure pipeline for EKS cluster management.
+
+## Pipeline Overview
+
+```mermaid
+graph TD
+    A[Push to Repository] --> B[Configure AWS]
+    B --> C[Setup Terraform]
+    C --> D[Create Variables]
+    D --> E[Initialize]
+    E --> F[Plan]
+    F --> G{Main Branch?}
+    G -->|Yes| H[Apply]
+    G -->|No| I[Skip Apply]
+```
+
+## Trigger Events
+
+- Push to `main` branch
+- Push to `feature/*` branches
+- Push to `fix/*` branches
+- Manual trigger via `workflow_dispatch`
+
+### Path Filters
+Only triggers on changes to:
+- `iac/**`
+- `.github/workflows/infrastructure-workflow.yml`
+
+## Pipeline Configuration
+
+### Permissions
+- `contents: read`: Read repository contents
+- `id-token: write`: OIDC token management
+
+### Environment
+- Runner: `ubuntu-latest`
+- Timeout: 30 minutes
+- Shell: bash
+
+## Job Steps
+
+### 1. AWS Configuration
+- Uses OIDC authentication
+- Assumes GitHub Actions role
+- Sets up AWS credentials
+
+### 2. Terraform Setup
+- Version: 1.6.0
+- Automated installation
+- Hashicorp official action
+
+### 3. Variable Management
+
+**Parameters from AWS SSM**:
+- Project name
+- Environment
+- VPC CIDR
+- Cluster version
+- Subnet configurations
+- Node group settings
+- Tags
+
+**Secret Parameters**:
+- DockerHub credentials
+- Grafana admin password
+
+### 4. Terraform Operations
+
+#### Init
+```bash
+terraform init -backend-config=dev-backend.hcl
+```
+
+#### Plan
+```bash
+terraform plan -out tfplan.plan -var-file=terraform.tfvars
+```
+
+#### Apply
+Conditions:
+- On `main` branch
+- On `feature/*` branches
+- On `fix/*` branches
+
+Command:
+```bash
+terraform apply -auto-approve tfplan.plan
+```
+
+## Infrastructure Components
+
+### Network
+- VPC configuration
+- Public/Private subnets
+- Availability Zones
+
+### EKS Cluster
+- Version management
+- Node groups
+- IAM roles
+
+### Supporting Services
+- DockerHub integration
+- Grafana setup
+- Monitoring tools
+
+## Security Measures
+
+1. **Authentication**
+   - OIDC-based AWS auth
+   - Role-based access
+   - Session management
+
+2. **Secret Management**
+   - AWS Parameter Store
+   - GitHub Secrets
+   - No plaintext credentials
+
+3. **Access Control**
+   - Minimal permissions
+   - Time-limited sessions
+   - Scoped access roles
+
+## Best Practices
+
+1. **State Management**
+   - Remote state storage
+   - State locking
+   - Backup strategy
+
+2. **Change Control**
+   - Plan review
+   - Conditional applies
+   - Version tracking
+
+3. **Resource Tagging**
+   - Consistent naming
+   - Environment tags
+   - Cost allocation
+
+## Monitoring and Logging
+
+1. **Execution Tracking**
+   - GitHub Actions logs
+   - Terraform logs
+   - AWS CloudTrail
+
+2. **State Monitoring**
+   - Resource changes
+   - Plan outputs
+   - Apply results
+
+## Disaster Recovery
+
+1. **State Recovery**
+   - Backup access
+   - Restore procedures
+   - Version control
+
+2. **Infrastructure Recovery**
+   - Rollback capability
+   - State import
+   - Resource recreation

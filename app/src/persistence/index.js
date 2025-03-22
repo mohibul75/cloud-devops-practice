@@ -5,8 +5,9 @@ if (process.env.MONGODB_HOST && process.env.MONGODB_USERNAME && process.env.MONG
   const database = process.env.MONGODB_DATABASE || 'todos';
   const username = encodeURIComponent(process.env.MONGODB_USERNAME);
   const password = encodeURIComponent(process.env.MONGODB_PASSWORD);
+  const replicaSet = process.env.MONGODB_REPLICA_SET || 'myReplicaSet';
 
-  process.env.MONGODB_URI = `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=admin&directConnection=true`;
+  process.env.MONGODB_URI = `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=admin&replicaSet=${replicaSet}`;
   console.log('MongoDB connection string constructed (credentials masked):', 
     process.env.MONGODB_URI.replace(password, '****'));
 }
