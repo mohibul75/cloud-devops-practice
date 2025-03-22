@@ -48,6 +48,16 @@ spec:
             secretKeyRef:
               name: todo-app-mongodb-secret
               key: host
+        - name: MONGODB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: port
+        - name: MONGODB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-mongodb-secret
+              key: database
         - name: MONGODB_USERNAME
           valueFrom:
             secretKeyRef:

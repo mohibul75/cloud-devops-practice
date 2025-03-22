@@ -1,6 +1,6 @@
 // Construct MongoDB URI if credentials are available
-if (process.env.MONGODB_USERNAME && process.env.MONGODB_PASSWORD) {
-  process.env.MONGODB_URI = `mongodb://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@mongodb.dev.svc.cluster.local:27017/todos?authSource=admin`;
+if (process.env.MONGODB_HOST && process.env.MONGODB_PORT && process.env.MONGODB_USERNAME && process.env.MONGODB_PASSWORD) {
+  process.env.MONGODB_URI = `mongodb://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DATABASE || 'todos'}?authSource=admin`;
 }
 
 if (process.env.MONGODB_URI) module.exports = require('./mongodb');
