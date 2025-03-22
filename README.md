@@ -1,196 +1,93 @@
-# EKS Infrastructure Project
+# DevOps Practice Project
 
-A comprehensive Infrastructure as Code (IaC) project for deploying and managing an AWS EKS cluster with integrated monitoring, logging, tracing, and service mesh capabilities.
+This project demonstrates a comprehensive DevOps implementation challenge, showcasing modern cloud-native practices and infrastructure automation.
+
+## Technology Stack
+
+- **Infrastructure**: AWS cloud infrastructure orchestrated through Terraform, managing both AWS resources and Kubernetes objects
+- **CI/CD**: Automated pipelines implemented with GitHub Actions for continuous integration and deployment
+- **Monitoring**: Complete observability stack including:
+  - Grafana for visualization
+  - Prometheus for metrics
+  - Loki for log aggregation
+  - Tempo for distributed tracing
+  All components are deployed via Helm charts and managed through Terraform
+
+> **Note**: Due to time constraints, the monitoring stack implementation is currently basic. While all components are functional and properly integrated, advanced features like custom dashboards and alerting rules can be introduced.
+
+## Development Practices
+
+The project follows industry-standard software development lifecycle (SDLC) practices:
+- Issue tracking through GitHub Issues
+- Version control with Git
+- Standardized commit message format
+- Trunk-based development strategy
+
+Comprehensive documentation for each component is available in the [docs](docs/) directory.
 
 ## Directory Structure
 
 ```
-assessment/
+.
 ├── .github/
-│   └── workflows/              # CI/CD Pipeline configurations
-│       ├── [infrastructure-workflow.yml](/.github/workflows/infrastructure-workflow.yml)
-│       └── docs/              # Pipeline documentation
-├── app/                       # Application source code
-│   ├── src/                  # Application source files
-│   ├── spec/                 # Test specifications
-│   ├── Dockerfile           # Optimized container configuration
-│   └── package.json         # Node.js dependencies
+│   └── workflows/                    # CI/CD Pipeline configurations
+│       ├── application-workflow.yml  # Application deployment pipeline
+│       ├── data-workflow.yml         # Data persistence pipeline
+│       └── infrastructure-workflow.yml # Infrastructure pipeline
 ├── docs/
-│   └── workflows/             # Detailed workflow documentation
-│       ├── infrastructure/    # Infrastructure pipeline docs
-│       └── application/       # Application pipeline docs
-├── iac/                       # Infrastructure as Code
-│   ├── [README.md](/iac/README.md)  # IaC documentation
-│   ├── modules/              # Terraform modules
-│   │   ├── vpc/             # VPC configuration
-│   │   └── eks/             # EKS and controllers
-│   ├── main.tf              # Main Terraform configuration
-│   └── variables.tf         # Input variables
-└── [LICENSE](/LICENSE)       # Project license
+│   ├── branching-strategy/          # Git branching strategy docs
+│   │   └── README.md
+│   └── workflows/                   # Pipeline documentation
+│       ├── application/             # Application pipeline docs
+│       │   └── README.md
+│       ├── data-persistent/         # Data pipeline docs
+│       │   └── README.md
+│       ├── infrastructure/          # Infrastructure pipeline docs
+│       │   └── README.md
+│       └── README.md               # Overview of all pipelines
+├── iac/                            # Infrastructure as Code
+│   ├── modules/                    # Terraform modules
+│   │   ├── eks/                   # EKS cluster configuration
+│   │   │   ├── main.tf
+│   │   │   └── variables.tf
+│   │   └── vpc/                   # VPC configuration
+│   │       ├── main.tf
+│   │       └── variables.tf
+│   ├── main.tf                    # Main Terraform configuration
+│   └── variables.tf               # Terraform variables
+└── kube/                          # Kubernetes manifests
+    ├── mongodb-statefulset.yml    # MongoDB StatefulSet config
+    └── storage-class.yml          # Storage class definition
 ```
 
 ## Directory Descriptions
 
-### [Infrastructure as Code (iac)](/iac)
-The `iac` directory contains all Terraform configurations for our AWS infrastructure. See [iac/README.md](/iac/README.md) for detailed documentation.
+### Infrastructure as Code (`iac/`)
+Contains Terraform configurations for AWS infrastructure:
+- EKS cluster setup
+- VPC and networking
+- IAM roles and policies
+- Monitoring stack deployment
 
-- **Purpose**: Manages cloud infrastructure using Terraform
-- **Key Components**:
-  - EKS Cluster (v1.27)
-  - VPC with public/private subnets
-  - Monitoring stack (Grafana, Prometheus, Loki, Tempo)
-  - Service mesh (Istio, Kiali)
-- **Documentation**: Comprehensive guide for infrastructure deployment and management
+### Kubernetes Manifests (`kube/`)
+Contains Kubernetes resource definitions:
+- MongoDB StatefulSet configuration
+- Storage class definitions
+- Service configurations
 
-### [Application (app)](/app)
-The `app` directory contains the Node.js application code that will be deployed to our EKS cluster.
+### Documentation (`docs/`)
+Project documentation organized by component:
+- Branching strategy
+- Pipeline workflows
+  - Application deployment
+  - Data persistence
+  - Infrastructure management
 
-- **Purpose**: Sample application for deployment
-- **Key Components**:
-  - Express.js REST API
-  - SQLite database
-  - Unit tests
-  - Multi-stage Dockerfile
-- **Features**:
-  - Optimized container build
-  - Health checks
-  - Graceful shutdown
-  - Security hardening
-
-### [GitHub Workflows (.github/workflows)](/.github/workflows)
-CI/CD pipeline configurations and automation scripts. See [infrastructure-workflow.yml](/.github/workflows/infrastructure-workflow.yml) for the main pipeline.
-
-- **Purpose**: Automates infrastructure deployment and testing
-- **Key Features**:
-  - AWS authentication via OIDC
-  - Terraform automation
-  - Security checks
-  - State management
-- **Documentation**: Pipeline setup and configuration guides
-
-### [Documentation (docs)](/docs)
-Comprehensive project documentation organized by component.
-
-- **Purpose**: Central knowledge repository
-- **Key Sections**:
-  - [Infrastructure Workflows](/docs/workflows/infrastructure): Infrastructure pipeline documentation
-  - [Application Workflows](/docs/workflows/application): Application deployment guides
-  - Architecture diagrams
-  - Security policies
-  - Best practices
-- **Usage**: Reference for development and operations teams
-
-## Branching Strategy
-
-### Main Branches
-- `main` (default): Production-ready code
-- `dev`: Development and integration
-- `staging`: Pre-production testing
-
-### Feature Branches
-Format: `feature/<issue-number>-<brief-description>`
-Example: `feature/123-add-grafana-dashboards`
-
-### Hotfix Branches
-Format: `hotfix/<issue-number>-<brief-description>`
-Example: `hotfix/456-fix-prometheus-config`
-
-### Release Branches
-Format: `release/v<major>.<minor>.<patch>`
-Example: `release/v1.2.0`
-
-## Commit Message Convention
-
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation
-- `chore`: Maintenance
-- `refactor`: Code restructuring
-- `test`: Adding tests
-- `ci`: CI/CD changes
-
-### Examples
-```bash
-feat(monitoring): add custom Grafana dashboards
-fix(eks): correct node group scaling configuration
-docs(readme): update deployment instructions
-```
-
-## Pull Request Guidelines
-
-### PR Template
-- Title: Follow commit message convention
-- Description: Include purpose, changes, and testing done
-- Reference: Link related issues
-
-### Requirements
-1. **Code Review**
-   - Minimum 2 approvals required
-   - Must pass all CI checks
-   - No merge conflicts
-
-2. **Documentation**
-   - Update relevant documentation
-   - Include configuration changes
-   - Add comments for complex logic
-
-3. **Testing**
-   - Include test results
-   - Add new tests for features
-   - Update existing tests
-
-### Review Process
-1. Code quality check
-2. Architecture review
-3. Security assessment
-4. Documentation review
-
-## AI Integration
-
-### Automated Code Review
-
-This repository uses [CodeRabbit AI](https://www.coderabbit.ai/) for automated code reviews, ensuring code quality even in self-maintained projects. CodeRabbit AI provides comprehensive code analysis and suggestions for improvements.
-
-#### Features
-
-- Automated code quality assessment
-- Security vulnerability detection
-- Performance optimization suggestions
-- Style and best practices enforcement
-- Documentation completeness checks
-- Inline code suggestions with commit-ready improvements
-
-#### Example Reviews
-
-Here are examples of CodeRabbit AI in action:
-
-1. **Pull Request Summary**  
-   CodeRabbit AI provides a comprehensive summary of changes and their impact:
-   ![Example Code Review](docs/static-resources/commit-summary.png)
-
-2. **Inline Code Suggestions**  
-   Detailed code improvements with ready-to-commit suggestions:
-   ![PR Comment](docs/static-resources/PR-review-comment.png)
-
-#### Best Practices
-
-1. Always review AI suggestions before implementing
-2. Pay special attention to security-related recommendations
-3. Use AI suggestions as learning opportunities to improve code quality
-4. Consider implementing suggested improvements promptly for better code maintainability
-
-For more information about CodeRabbit AI configuration and features, visit their [official documentation](https://www.coderabbit.ai/docs).
+### GitHub Workflows (`.github/workflows/`)
+CI/CD pipeline configurations:
+- Application deployment workflow
+- Data persistence workflow
+- Infrastructure deployment workflow
 
 ## Getting Started
 
@@ -225,17 +122,9 @@ For more information about CodeRabbit AI configuration and features, visit their
 
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
 
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
 
 ## Support
 
 For support and questions:
 - Create an issue
-- Contact DevOps team
 - Check documentation
