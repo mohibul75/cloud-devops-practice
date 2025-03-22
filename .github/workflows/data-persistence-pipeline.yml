@@ -7,9 +7,9 @@ on:
     - 'kube/storage-class.yml'
     - 'kube/mongodb-statefulset.yml'
     branches:
-      - main
-      - fix/*
-      - feature/*
+      # - main
+      # - fix/*
+      # - feature/*
   workflow_dispatch:
 
 permissions:

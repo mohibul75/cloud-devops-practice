@@ -81,8 +81,8 @@ spec:
         startupProbe:
           exec:
             command:
-            - cat
-            - /proc/1/status
+            - ls
+            - /app
           periodSeconds: 10
           failureThreshold: 30
           successThreshold: 1
