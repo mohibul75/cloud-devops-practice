@@ -58,10 +58,6 @@ spec:
             secretKeyRef:
               name: todo-app-mongodb-secret
               key: password
-        - name: MONGODB_PORT
-          value: "27017"
-        - name: MONGODB_DB
-          value: "todo-app"
         resources:
           requests:
             memory: "64Mi"
