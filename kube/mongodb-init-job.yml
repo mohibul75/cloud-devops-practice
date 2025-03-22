@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-init
+  namespace: dev
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: mongodb-init
+        image: mongo:6.0
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until mongosh --host localhost:27017 --eval "print('waiting for connection')"
+          do
+            sleep 2
+          done
+          mongosh --host localhost:27017 --eval "
+            db = db.getSiblingDB('admin');
+            db.createUser({
+              user: '$MONGODB_USERNAME',
+              pwd: '$MONGODB_PASSWORD',
+              roles: [{ role: 'root', db: 'admin' }]
+            });
+            db = db.getSiblingDB('todos');
+            db.createUser({
+              user: '$MONGODB_USERNAME',
+              pwd: '$MONGODB_PASSWORD',
+              roles: [{ role: 'readWrite', db: 'todos' }]
+            });"
+        env:
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+      hostNetwork: true
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - mongodb
+            topologyKey: "kubernetes.io/hostname"
+      restartPolicy: OnFailure

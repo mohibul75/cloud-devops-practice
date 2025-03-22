@@ -20,6 +20,69 @@ spec:
       containers:
       - name: mongodb
         image: mongo:6.0
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -x # print command been ran
+          set -e # fail if any command fails
+
+          # Generate keyfile for replica set authentication
+          echo "${MONGO_INITDB_ROOT_PASSWORD}" | base64 > /data/db/keyfile
+          chmod 400 /data/db/keyfile
+
+          printf "\n\t mongod:: start in the background \n\n";
+          mongod \
+            --port="${MONGO_PORT}" \
+            --bind_ip_all \
+            --replSet="${MONGO_REPLICA_SET}" \
+            --quiet > /tmp/mongo.log.json 2>&1 &
+
+          sleep 9;
+
+          printf "\n\t mongod: check and set master \n\n";
+          mongosh --port "${MONGO_PORT}" --eval '
+            try {
+              rs.status();
+            } catch (err) {
+              if (err.codeName === "NotYetInitialized") {
+                rs.initiate({});
+                sleep(3000);
+              }
+            }'
+
+          printf "\n\t mongod: add user \n\n";
+          mongosh --port "${MONGO_PORT}" --eval "
+            try {
+              db.getSiblingDB('admin').createUser({
+                user: '${MONGO_INITDB_ROOT_USERNAME}',
+                pwd: '${MONGO_INITDB_ROOT_PASSWORD}',
+                roles: [{ role: 'userAdminAnyDatabase', db: 'admin' }]
+              });
+              
+              db.getSiblingDB('todos').createUser({
+                user: '${MONGO_INITDB_ROOT_USERNAME}',
+                pwd: '${MONGO_INITDB_ROOT_PASSWORD}',
+                roles: [{ role: 'readWrite', db: 'todos' }]
+              });
+            } catch (err) {
+              if (!err.message.includes('already exists')) {
+                throw err;
+              }
+            }"
+
+          printf "\n\t mongod: shutdown \n\n";
+          mongod --shutdown;
+          sleep 3;
+
+          printf "\n\t mongod: restart with authentication \n\n";
+          exec mongod \
+            --auth \
+            --keyFile=/data/db/keyfile \
+            --port="${MONGO_PORT}" \
+            --bind_ip_all \
+            --replSet="${MONGO_REPLICA_SET}" \
+            --verbose=v
         ports:
         - containerPort: 27017
           name: mongodb
@@ -37,13 +100,10 @@ spec:
             secretKeyRef:
               name: mongodb-secret
               key: password
-        # resources:
-        #   requests:
-        #     cpu: 100m
-        #     memory: 128Mi
-        #   limits:
-        #     cpu: 200m
-        #     memory: 256Mi
+        - name: MONGO_REPLICA_SET
+          value: "myReplicaSet"
+        - name: MONGO_PORT
+          value: "27017"
         livenessProbe:
           exec:
             command:
@@ -64,6 +124,10 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 20
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-data
   volumeClaimTemplates:
   - metadata:
       name: mongodb-data
@@ -99,13 +163,13 @@ stringData:
   username: ${MONGODB_USERNAME}
   password: ${MONGODB_PASSWORD}
 ---
-apiVersion: networking.istio.io/v1
+apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: mongodb
   namespace: dev
 spec:
-  host: mongodb
+  host: mongodb.dev.svc.cluster.local
   trafficPolicy:
     tls:
       mode: ISTIO_MUTUAL
