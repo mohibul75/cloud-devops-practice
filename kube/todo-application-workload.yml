@@ -30,6 +30,9 @@ spec:
         azure.workload.identity/use: "true"
       annotations:
         sidecar.istio.io/inject: "true"
+        proxy.istio.io/config: |
+          terminationDrainDuration: 60s
+          holdApplicationUntilProxyStarts: true
     spec:
       imagePullSecrets:
       - name: regcred
