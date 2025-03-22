@@ -15,16 +15,13 @@ spec:
       labels:
         app: mongodb
       annotations:
-        sidecar.istio.io/inject: "true"
-        proxy.istio.io/config: |
-          terminationDrainDuration: 60s
-          holdApplicationUntilProxyStarts: true
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: mongodb
         image: mongo:6.0
         command:
-        - /bin/sh
+        - /bin/bash
         - -c
         - |
           set -x # print command been ran
@@ -36,15 +33,15 @@ spec:
 
           printf "\n\t mongod:: start in the background \n\n";
           mongod \
-            --port="${MONGO_PORT}" \
+            --port=${MONGO_PORT} \
             --bind_ip_all \
-            --replSet="${MONGO_REPLICA_SET}" \
+            --replSet=${MONGO_REPLICA_SET} \
             --quiet > /tmp/mongo.log.json 2>&1 &
 
           sleep 9;
 
           printf "\n\t mongod: check and set master \n\n";
-          mongosh --port "${MONGO_PORT}" --eval '
+          mongosh --port ${MONGO_PORT} --eval '
             try {
               rs.status();
             } catch (err) {
@@ -55,7 +52,7 @@ spec:
             }'
 
           printf "\n\t mongod: add user \n\n";
-          mongosh --port "${MONGO_PORT}" --eval "
+          mongosh --port ${MONGO_PORT} --eval "
             try {
               db.getSiblingDB('admin').createUser({
                 user: '${MONGO_INITDB_ROOT_USERNAME}',
@@ -82,9 +79,9 @@ spec:
           exec mongod \
             --auth \
             --keyFile=/data/db/keyfile \
-            --port="${MONGO_PORT}" \
+            --port=${MONGO_PORT} \
             --bind_ip_all \
-            --replSet="${MONGO_REPLICA_SET}" \
+            --replSet=${MONGO_REPLICA_SET} \
             --verbose=v
         ports:
         - containerPort: 27017
@@ -165,16 +162,3 @@ type: Opaque
 stringData:
   username: ${MONGODB_USERNAME}
   password: ${MONGODB_PASSWORD}
----
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: mongodb
-  namespace: dev
-spec:
-  host: mongodb.dev.svc.cluster.local
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL
-    loadBalancer:
-      simple: ROUND_ROBIN

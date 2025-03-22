@@ -6,8 +6,17 @@ let collection;
 
 async function connect() {
   try {
-    client = await MongoClient.connect(process.env.MONGODB_URI);
-    db = client.db();
+    // Construct MongoDB URI with replica set
+    const uri = `mongodb://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DATABASE}?authSource=admin&replicaSet=myReplicaSet&directConnection=false`;
+    console.log('MongoDB connection string constructed (credentials masked):', uri.replace(/:[^:@]*@/, ':****@'));
+
+    client = await MongoClient.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+    });
+    
+    db = client.db(process.env.MONGODB_DATABASE);
     collection = db.collection('todos');
     
     // Create indexes
@@ -16,7 +25,7 @@ async function connect() {
     
     console.log('Successfully connected to MongoDB');
   } catch (err) {
-    console.error('Failed to connect to MongoDB:', err);
+    console.error('Failed to connect to MongoDB:', err.name, err.message, err.stack);
     throw err;
   }
 }
