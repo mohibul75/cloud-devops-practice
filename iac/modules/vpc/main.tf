@@ -44,6 +44,7 @@ resource "aws_subnet" "private" {
     {
       Name = "${local.name}-private-${var.azs[count.index]}"
       "kubernetes.io/role/internal-elb" = "1"
+      "karpenter.sh/discovery" = "infra-practice-dev" # cluster name: infra-practice-dev
     },
     var.tags
   )

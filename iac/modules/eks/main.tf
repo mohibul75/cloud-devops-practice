@@ -225,6 +225,13 @@ resource "aws_eks_cluster" "main" {
   tags = var.tags
 }
 
+# Tag the cluster security group for Karpenter discovery
+resource "aws_ec2_tag" "cluster_sg_tag" {
+  resource_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+  key         = "kubernetes.io/cluster/${local.name}"
+  value       = "owned"
+}
+
 # Create OIDC Provider
 data "tls_certificate" "eks" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer

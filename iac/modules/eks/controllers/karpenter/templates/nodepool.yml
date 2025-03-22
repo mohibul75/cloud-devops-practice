@@ -1,0 +1,39 @@
+apiVersion: karpenter.sh/v1alpha5
+kind: NodePool
+metadata:
+  name: default
+spec:
+  template:
+    metadata:
+      labels:
+        nodegroup-type: compute
+        nodegroup-role: worker
+        environment: ${environment}
+        nodepool: karpenter
+        kubernetes.io/os: linux
+        node-lifecycle: on-demand
+    spec:
+      nodeClassRef:
+        name: default
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: ["t3", "t3a", "t2"]
+        - key: karpenter.k8s.aws/instance-size
+          operator: In
+          values: ["medium", "large", "xlarge"]
+  limits:
+    cpu: "100"
+    memory: 400Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 30s
