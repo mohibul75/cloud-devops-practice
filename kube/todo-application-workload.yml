@@ -71,6 +71,8 @@ spec:
             secretKeyRef:
               name: todo-app-mongodb-secret
               key: password
+        - name: MONGODB_REPLICA_SET
+          value: "myReplicaSet"
         resources:
           requests:
             memory: "64Mi"
