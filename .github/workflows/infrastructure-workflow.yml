@@ -86,15 +86,15 @@ jobs:
       run: terraform init -backend-config=dev-backend.hcl
       working-directory: ./iac
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve
+    # - name: Terraform Destroy
+    #   run: terraform destroy -auto-approve
+    #   working-directory: ./iac
+
+    - name: Terraform Plan
+      run: terraform plan -out tfplan.plan -var-file=terraform.tfvars
       working-directory: ./iac
 
-    # - name: Terraform Plan
-    #   run: terraform plan -out tfplan.plan -var-file=terraform.tfvars
-    #   working-directory: ./iac
-
-    # - name: Terraform Apply
-    #   if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')
-    #   run: terraform apply -auto-approve tfplan.plan
-    #   working-directory: ./iac
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/feature/') || startsWith(github.ref, 'refs/heads/fix/')
+      run: terraform apply -auto-approve tfplan.plan
+      working-directory: ./iac
