@@ -15,6 +15,8 @@ This project demonstrates a comprehensive DevOps implementation challenge, showc
 
 > **Note**: Due to time constraints, the monitoring stack implementation is currently basic. While all components are functional and properly integrated, advanced features like custom dashboards and alerting rules can be introduced.
 
+>**Note**: SSL certificated is not set up in the current configuration sue to time constraints.
+
 ## Development Practices
 
 The project follows industry-standard software development lifecycle (SDLC) practices:
@@ -24,6 +26,38 @@ The project follows industry-standard software development lifecycle (SDLC) prac
 - Trunk-based development strategy
 
 Comprehensive documentation for each component is available in the [docs](docs/) directory.
+
+## Key Features
+
+### Infrastructure
+- **Cloud Platform**: AWS infrastructure managed through Terraform
+- **Kubernetes**: EKS cluster with 2 worker nodes
+- **Auto Scaling**:
+  - Node scaling via Karpenter
+  - Pod scaling via Horizontal Pod Autoscaler (HPA)
+
+### Storage & Database
+- **Persistent Storage**: EBS-backed StorageClass with dynamic provisioning
+- **Database**: MongoDB deployed as StatefulSet with persistent volumes
+- **Security**: Secrets management for MongoDB credentials
+
+### Service Mesh & Networking
+- **Istio Integration**:
+  - Ingress Gateway for external traffic
+  - Service-to-service communication
+  - Traffic management and routing
+- **Access**: Application exposed via LoadBalancer service
+
+### Monitoring & Observability
+- **Metrics**: Prometheus for metric collection and storage
+- **Logging**: Loki for log aggregation
+- **Tracing**: Tempo for distributed tracing
+- **Visualization**: Grafana dashboards for monitoring
+
+### Application Deployment
+- **CI/CD**: Automated deployment pipeline via GitHub Actions
+- **Container Registry**: Images stored in [DockerHub](https://hub.docker.com/repository/docker/purbo75/application/general)
+- **Traffic Management**: Controlled via Istio Gateway and VirtualService
 
 ## Directory Structure
 
