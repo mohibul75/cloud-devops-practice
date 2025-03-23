@@ -35,6 +35,11 @@ Comprehensive documentation for each component is available in the [docs](docs/)
 - **Auto Scaling**:
   - Node scaling via Karpenter
   - Pod scaling via Horizontal Pod Autoscaler (HPA)
+- **Pod Scheduling Strategy**:
+  - Node taints for dedicated workload isolation
+  - Pod tolerations for specific node assignment
+  - Required pod anti-affinity for high availability
+  - Guaranteed pod distribution across nodes
 
 ### Storage & Database
 - **Persistent Storage**: EBS-backed StorageClass with dynamic provisioning

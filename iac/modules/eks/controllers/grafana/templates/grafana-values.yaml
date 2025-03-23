@@ -72,6 +72,17 @@ datasources:
           serviceMap:
             datasourceUid: prometheus
 
+grafana:
+  tolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "node-1"
+    effect: "NoSchedule"
+  - key: "dedicated"
+    operator: "Equal"
+    value: "node-2"
+    effect: "NoSchedule"
+
 # plugins:
 #   - grafana-piechart-panel
 #   - grafana-clock-panel

@@ -46,8 +46,8 @@ aws ssm put-parameter \
 
 # Node Groups Configuration
 NODE_GROUPS_JSON='{
-  "default": {
-    "instance_types": ["t3.small"],
+  "default-ng": {
+    "instance_types": ["t3.medium"],
     "capacity_type": "ON_DEMAND",
     "scaling_config": {
       "desired_size": 1,

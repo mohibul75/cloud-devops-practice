@@ -5,7 +5,7 @@ metadata:
   namespace: dev
   name: todo-application-deployment
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 2
   selector:
     matchLabels:
@@ -34,6 +34,22 @@ spec:
           terminationDrainDuration: 60s
           holdApplicationUntilProxyStarts: true
     spec:
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "node-1"
+        effect: "NoSchedule"
+      - key: "dedicated"
+        operator: "Equal"
+        value: "node-2"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: todo-application
+            topologyKey: "kubernetes.io/hostname"
       imagePullSecrets:
       - name: regcred
       containers:

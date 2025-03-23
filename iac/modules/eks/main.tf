@@ -261,6 +261,12 @@ resource "aws_eks_node_group" "main" {
   capacity_type  = each.value.capacity_type
   ami_type       = "AL2023_x86_64_STANDARD"
 
+  taint {
+    key    = "dedicated"
+    value  = each.key
+    effect = "NoSchedule"
+  }
+
   launch_template {
     id      = aws_launch_template.eks_nodes[each.key].id
     version = aws_launch_template.eks_nodes[each.key].latest_version

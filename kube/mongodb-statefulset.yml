@@ -17,6 +17,15 @@ spec:
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "node-1"
+        effect: "NoSchedule"
+      - key: "dedicated"
+        operator: "Equal"
+        value: "node-2"
+        effect: "NoSchedule"
       containers:
       - name: mongodb
         image: mongo:6.0.11
@@ -64,36 +73,36 @@ spec:
           echo "Replica set primary is ready"
 
           printf "\n\t mongod: create admin user \n\n"
-          mongosh --port 27017 --eval '
+          mongosh --port 27017 --eval "
           try {
-            admin = db.getSiblingDB("admin");
+            admin = db.getSiblingDB('admin');
             admin.createUser({
-              user: "admin",
-              pwd: "Abc12345",
-              roles: [{ role: "root", db: "admin" }]
+              user: '$MONGO_USERNAME',
+              pwd: '$MONGO_PASSWORD',
+              roles: [{ role: 'root', db: 'admin' }]
             });
           } catch (err) {
-            if (!err.message.includes("already exists")) {
+            if (!err.message.includes('already exists')) {
               throw err;
             }
-          }'
+          }"
 
           printf "\n\t mongod: create todo database and user \n\n"
-          mongosh --port 27017 --eval '
+          mongosh --port 27017 --eval "
           try {
-            admin = db.getSiblingDB("admin");
-            admin.auth("admin", "Abc12345");
-            todos = db.getSiblingDB("todos");
+            admin = db.getSiblingDB('admin');
+            admin.auth('$MONGO_USERNAME', '$MONGO_PASSWORD');
+            todos = db.getSiblingDB('todos');
             todos.createUser({
-              user: "admin",
-              pwd: "Abc12345",
-              roles: [{ role: "readWrite", db: "todos" }]
+              user: '$MONGO_USERNAME',
+              pwd: '$MONGO_PASSWORD',
+              roles: [{ role: 'readWrite', db: 'todos' }]
             });
           } catch (err) {
-            if (!err.message.includes("already exists")) {
+            if (!err.message.includes('already exists')) {
               throw err;
             }
-          }'
+          }"
 
           # Shutdown MongoDB
           mongod --shutdown --dbpath /data/db
@@ -107,9 +116,9 @@ spec:
         - name: mongodb-data
           mountPath: /data/db
         env:
-        - name: MONGO_INITDB_ROOT_USERNAME
+        - name: MONGO_USERNAME
           value: "admin"
-        - name: MONGO_INITDB_ROOT_PASSWORD
+        - name: MONGO_PASSWORD
           value: "Abc12345"
         - name: MONGO_REPLICA_SET
           value: "myReplicaSet"
@@ -151,5 +160,5 @@ metadata:
   namespace: dev
 type: Opaque
 stringData:
-  username: "admin"
-  password: "Abc12345"
+  username: ${MONGO_USERNAME}
+  password: ${MONGO_PASSWORD}
