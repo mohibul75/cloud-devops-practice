@@ -1,6 +1,6 @@
 # Using Vertical Pod Autoscaler (VPA) for Resource Optimization
 
-> **Note**: This guide is based on practical implementation experience. For a detailed walkthrough and real-world case study, check out my article: [From Trial and Error to Automated Efficiency: Implementing Vertical Pod Autoscaler for Kubernetes](https://medium.com/@mohibulalam75/from-trial-and-error-to-automated-efficiency-implementing-vertical-pod-autoscaler-for-kubernetes-5c8c4b204bc7)
+> **Note**: This guide is based on my practical implementation experience. For a detailed walkthrough and real-world case study, check out my article: [From Trial and Error to Automated Efficiency: Implementing Vertical Pod Autoscaler for Kubernetes](https://medium.com/@mohibulalam75/from-trial-and-error-to-automated-efficiency-implementing-vertical-pod-autoscaler-for-kubernetes-5c8c4b204bc7)
 
 ## Overview
 The Vertical Pod Autoscaler (VPA) automatically adjusts the CPU and memory resource requests and limits for your Pods. This guide explains how to use VPA's recommendations to optimize your Pod's resource configuration.
@@ -9,8 +9,8 @@ The Vertical Pod Autoscaler (VPA) automatically adjusts the CPU and memory resou
 
 ### Components
 1. **Recommender** - Monitors resource utilization and provides recommended values
-2. **Updater** - (Disabled in our setup) Would automatically update Pod resources
-3. **Admission Controller** - (Disabled in our setup) Would apply recommendations to new Pods
+2. **Updater** - (Disabled in my setup) Would automatically update Pod resources
+3. **Admission Controller** - (Disabled in my setup) Would apply recommendations to new Pods
 
 ### My Configuration
 I use VPA in "recommendation mode" only, which means:
@@ -19,7 +19,7 @@ I use VPA in "recommendation mode" only, which means:
 - Does NOT automatically update Pods
 - Requires manual application of recommendations
 
-> **Implementation Note**: In our Todo application, we've successfully implemented this approach to optimize resource allocation. The configuration shown in the examples below reflects our actual production settings.
+> **Implementation Note**: In my Todo application, I've successfully implemented this approach to optimize resource allocation. The configuration shown in the examples below reflects my actual production settings.
 
 ## Using VPA Recommendations
 
@@ -62,9 +62,9 @@ Target:
 
 ### 3. Apply Recommendations
 
-> **Note**: We've successfully used these approaches in our Todo application deployment, with the Conservative Approach proving particularly effective in our development environment.
+> **Note**: I've successfully used these approaches in my Todo application deployment, with the Conservative Approach proving particularly effective in my development environment.
 
-1. **Conservative Approach** (✨ Our Recommended Approach):
+1. **Conservative Approach** (✨ My Recommended Approach):
    - Start with values between Lower Bound and Recommended
    - For requests: use Lower Bound
    - For limits: use Recommended or Upper Bound
