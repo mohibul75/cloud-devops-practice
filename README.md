@@ -128,35 +128,6 @@ CI/CD pipeline configurations:
 - Data persistence workflow
 - Infrastructure deployment workflow
 
-## Getting Started
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/yourusername/assessment.git
-   ```
-
-2. Set up development environment
-   ```bash
-   cd assessment
-   # Install required tools
-   make setup
-   ```
-
-3. Create new feature branch
-   ```bash
-   git checkout -b feature/123-new-feature
-   ```
-
-4. Make changes and commit
-   ```bash
-   git commit -m "feat(scope): description"
-   ```
-
-5. Push changes and create PR
-   ```bash
-   git push origin feature/123-new-feature
-   ```
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
