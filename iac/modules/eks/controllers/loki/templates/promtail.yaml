@@ -16,3 +16,13 @@ resources:
 config:
   clients:
     - url: http://loki-gateway/loki/api/v1/push
+
+tolerations:
+- key: "dedicated"
+  operator: "Equal"
+  value: "node-1"
+  effect: "NoSchedule"
+- key: "dedicated"
+  operator: "Equal"
+  value: "node-2"
+  effect: "NoSchedule"

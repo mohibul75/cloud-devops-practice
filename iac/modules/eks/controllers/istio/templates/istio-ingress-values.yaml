@@ -37,6 +37,18 @@ podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "15020"
 
+gateways:
+  istio-ingressgateway:
+    tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "node-1"
+      effect: "NoSchedule"
+    - key: "dedicated"
+      operator: "Equal"
+      value: "node-2"
+      effect: "NoSchedule"
+
 nodeSelector: {}
 tolerations: []
 affinity: {}

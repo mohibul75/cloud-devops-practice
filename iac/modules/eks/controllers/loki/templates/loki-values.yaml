@@ -51,6 +51,15 @@ loki:
   table_manager:
     retention_deletes_enabled: true
     retention_period: 48h
+  tolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "node-1"
+    effect: "NoSchedule"
+  - key: "dedicated"
+    operator: "Equal"
+    value: "node-2"
+    effect: "NoSchedule"
 
 minio:
   enabled: false

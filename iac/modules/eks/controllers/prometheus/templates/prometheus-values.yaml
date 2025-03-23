@@ -19,6 +19,16 @@ prometheus:
     #     memory: 1Gi
     podMonitorSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
+    server:
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "node-1"
+        effect: "NoSchedule"
+      - key: "dedicated"
+        operator: "Equal"
+        value: "node-2"
+        effect: "NoSchedule"
 
 alertmanager:
   enabled: true
@@ -33,6 +43,15 @@ alertmanager:
     limits:
       cpu: 200m
       memory: 512Mi
+  tolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "node-1"
+    effect: "NoSchedule"
+  - key: "dedicated"
+    operator: "Equal"
+    value: "node-2"
+    effect: "NoSchedule"
 
 grafana:
   enabled: false # Using separate Grafana installation
